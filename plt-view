@@ -1,0 +1,87 @@
+#!/bin/bash
+
+set -x
+
+# Sanity Check
+test_bin() {
+  which $1 > /dev/null || ( echo "$1 not found" >&2;  exit 1)
+}
+
+test_bin hpgs
+test_bin epstopdf
+test_bin zenity
+
+# Strings
+
+_PRETITLE="PLT Betrachter"
+_CHOOSEPLT="HP/GL2 Plot Datei auswählen"
+_ERROR="Fehler"
+_NOOPENFILE="Die angegebene Datei konnte nicht gefunden werden:\n"
+_CONVERT="Konvertiere"
+_DURATION="Dieser Vorgang kann mehrere Minuten dauern."
+_PLEASEWAIT="Bitte warten ..."
+_GENEPS="HP/GL2 Plot Datei einlesen ... \n$_PLEASEWAIT"
+_GENPDF="PDF Datei erzeugen ... \n$_DURATION \n$_PLEASEWAIT"
+_FINISH="PDF Datei erzeugt. OK zum öffnen drücken."
+
+# Open File
+
+FILE=$1
+
+if [ ! -f "$FILE" ]; then 
+  FILE=`zenity --file-selection --title="$_CHOOSEPLT - $_PRETITLE"`
+  RETVAL=$?
+  [ "$RETVAL" = "0" ] || (
+    echo "No file selected" >&2
+    exit 1 )
+fi
+
+errormsg() {
+  zenity --error --title="$_ERROR - $_PRETITLE" \
+    --text "${1}${2}"
+  exit 1
+}
+
+test -f "$FILE" || errormsg "$_NOOPENFILE" "$FILE"
+
+
+TMPDIR=`mktemp -d`
+trap 'rm -rf $TMPDIR' EXIT
+TMPSTRING=$TMPDIR/$$.$RANDOM
+OUTFILE=$TMPDIR/`basename "${FILE%%.plt}"`.pdf
+
+# Convert
+(
+  HPGSTALK=`hpgs -o $TMPSTRING.eps "$FILE" 2>&1`
+  RETVAL=$?
+  [ "$RETVAL" = "0" ] || errormsg "$HPGSTALK"
+
+  echo "50"
+  echo "# $_GENPDF"
+
+  EPSTOPDFTALK=`epstopdf $TMPSTRING.eps 2>&1`
+  RETVAL=$?
+  [ "$RETVAL" = "0" ] || errormsg "$EPSTOPDFTALK"
+  
+  echo "100"
+  echo "# $_FINISH"
+
+  mv $TMPSTRING.pdf "$OUTFILE"
+) |
+(
+  zenity --progress \
+    --title="$_CONVERT - $_PRETITLE" \
+    --text="$_GENEPS" \
+    --percentage=0 \
+    --auto-close
+)
+
+test -f "$OUTFILE" && xdg-open "$OUTFILE"
+
+# If the conversion has been canceled
+RETVAL=$?
+[ "$RETVAL" = "0" ] || exit 1
+
+# Sleep a bit before we trap EXIT and remove the tempfiles
+sleep 10
+exit 0
