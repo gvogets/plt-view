@@ -10,6 +10,7 @@ test_bin() {
 test_bin hpgs
 test_bin epstopdf
 test_bin zenity
+test_bin xdg-open
 
 # Strings
 
@@ -76,7 +77,12 @@ OUTFILE=$TMPDIR/`basename "${FILE%%.plt}"`.pdf
     --auto-close
 )
 
-test -f "$OUTFILE" && xdg-open "$OUTFILE"
+# Open the pdf in a suitable viewer
+if [ `which kde-open` ]; then
+  test -f "$OUTFILE" && kde-open "$OUTFILE"
+else
+  test -f "$OUTFILE" && xdg-open "$OUTFILE"
+fi
 
 # If the conversion has been canceled
 RETVAL=$?
