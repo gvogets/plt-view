@@ -53,7 +53,7 @@ OUTFILE=$TMPDIR/`basename "${FILE%%.plt}"`.pdf
 
 # Convert
 (
-  HPGSTALK=`hpgs -o $TMPSTRING.eps "$FILE" 2>&1`
+  HPGSTALK=`hpgs -i -o $TMPSTRING.eps "$FILE" 2>&1`
   RETVAL=$?
   [ "$RETVAL" = "0" ] || errormsg "$HPGSTALK"
 
