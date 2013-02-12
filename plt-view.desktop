@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Name=plt-view
+GenericName=HP/GL2 File Viewer
+Type=Application
+Categories=Graphics
+MimeType=application/x-hpgl
+Exec=/usr/bin/plt-view %F
+TryExec=plt-view
+Terminal=false
+StartupNotify=false
