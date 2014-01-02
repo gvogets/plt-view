@@ -1,8 +1,0 @@
-[Desktop Entry]
-Version=1.0
-Type=MimeType
-Name=HP/GL 2 Plot Data
-MimeType=application/x-hpgl
-Icon=make
-Patterns=*.plt;*.PLT
-Comment=HP/GL 2 Plot Data

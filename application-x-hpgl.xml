@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
+  <mime-type type="application/x-hpgl">
+    <comment>HP/GL 2 Plot Data</comment>
+    <icon name="image-vnd.dgn"/>
+    <glob-deleteall/>
+  <glob pattern="*.plt"/>
+  <glob pattern="*.PLT"/>
+  </mime-type>
+</mime-info>
